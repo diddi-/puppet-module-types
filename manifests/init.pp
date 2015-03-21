@@ -5,6 +5,7 @@
 class types (
   $crons                = undef,
   $files                = undef,
+  $mknod                = undef,
   $mounts               = undef,
   $packages             = undef,
   $services             = undef,
@@ -28,6 +29,13 @@ class types (
     $files_hiera_merge_real = $files_hiera_merge
   }
   validate_bool($files_hiera_merge_real)
+
+  if type($mknod_hiera_merge) == 'string' {
+    $mknod_hiera_merge_real = str2bool($mknod_hiera_merge)
+  } else {
+    $mknod_hiera_merge_real = $mknod_hiera_merge
+  }
+  validate_bool($mknod_hiera_merge_real)
 
   if type($mounts_hiera_merge) == 'string' {
     $mounts_hiera_merge_real = str2bool($mounts_hiera_merge)
@@ -68,6 +76,16 @@ class types (
     }
     validate_hash($files_real)
     create_resources('types::file',$files_real)
+  }
+
+  if $mknod != undef {
+    if $mknod_hiera_merge_real == true {
+      $mknod_real = hiera_hash('types::mknod')
+    } else {
+      $mknod_real = $mknod
+    }
+    validate_hash($mknod_real)
+    create_resources('types::mknod',$mknod_real)
   }
 
   if $mounts != undef {
